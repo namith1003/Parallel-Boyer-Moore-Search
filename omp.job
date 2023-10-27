@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --job-name=omp_job       ### name your job 
+#SBATCH --time=03:00:00          ### hh:mm:ss or dd-hh:mm:ss
+#SBATCH --mem=16G                                ### memory setting is max @ 2 GB per core
+#SBATCH --ntasks=1                               ### launch one process
+#SBATCH --cpus-per-task=16                ### multi-threaded processes
+#SBATCH --output=omp.%j.out
+#SBATCH --partition=defq
+
+gcc -o ass1 ass1.c -lm -Wall -fopenmp
+gcc -o ass1p ass1p.c -lm -fopenmp -Wall
+
+if [ -f ass1 ] && [ -f ass1p ]
+then
+    	echo "Compilation Successful."
+        export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+        ./ass1 words.txt query.txt
+        ./ass1p words.txt query.txt
+else
+    	echo "Compilation Failed."
+fi
+exit 0
